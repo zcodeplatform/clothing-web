@@ -58,9 +58,13 @@ ordered for the product gallery; `ProductVariant` rows track stock for each
 color/size combination. `price` is the current selling price, and optional
 `compare_at` is the higher original price used to show a discount.
 
-The initial catalog seed gives the demo products 99 units per color/size
-combination. Future schema changes should use Flask-Migrate
-(`flask --app app db migrate`, then `flask --app app db upgrade`).
+Catalog prices, discounts, shipping, and cart totals use Kenyan shillings
+(KES); new order records include the KES currency code. Existing USD catalog
+and shipping amounts were converted at 1 USD = 129.920856 KES
+(ExchangeRate-API, 2026-11-08). The initial catalog
+seed gives the demo products 99 units per color/size combination. Future schema
+changes should use Flask-Migrate (`flask --app app db migrate`, then
+`flask --app app db upgrade`).
 Admin accounts are created only from the CLI with `flask --app app create-admin`;
 there is no public admin signup. Sign in at `/admin` to manage drafts, inventory,
 product images, discounts, and publishing.

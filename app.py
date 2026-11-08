@@ -848,6 +848,7 @@ def checkout():
             for item in summary["items"]
         ],
         "total": float(summary["total"]),
+        "currency": data.CURRENCY,
     })
     for item in summary["items"]:
         item["variant"].stock -= item["qty"]
