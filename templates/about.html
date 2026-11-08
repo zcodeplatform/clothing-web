@@ -39,5 +39,19 @@
   <div class="mt-12"><a class="btn btn--camel btn--xl" href="{{ url_for('shop') }}">Shop the collection</a></div>
 </section>
 
-{% include 'partials/reviews.html' %}
+<section class="container section">
+  <h2 class="h2-xl">Our Client Reviews</h2>
+  <div class="reviews">
+    {% for r in reviews %}
+      <figure class="review">
+        <div class="stars" aria-label="5 out of 5 stars">{% for _ in range(5) %}{{ icon('star', 'icon', solid=True) }}{% endfor %}</div>
+        <blockquote>“{{ r.text }}”</blockquote>
+        <figcaption>
+          <img src="{{ url_for('static', filename='img/' ~ r.image) }}" alt="{{ r.name }}" loading="lazy" width="768" height="1024">
+          <span><strong>{{ r.name }}</strong><small>{{ r.place }}</small></span>
+        </figcaption>
+      </figure>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

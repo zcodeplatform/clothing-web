@@ -97,8 +97,40 @@
   </div>
 </section>
 
-{% include 'partials/reviews.html' %}
-{% include 'partials/faq.html' %}
+<section class="container section">
+  <h2 class="h2-xl">Our Client Reviews</h2>
+  <div class="reviews">
+    {% for r in reviews %}
+      <figure class="review">
+        <div class="stars" aria-label="5 out of 5 stars">{% for _ in range(5) %}{{ icon('star', 'icon', solid=True) }}{% endfor %}</div>
+        <blockquote>“{{ r.text }}”</blockquote>
+        <figcaption>
+          <img src="{{ url_for('static', filename='img/' ~ r.image) }}" alt="{{ r.name }}" loading="lazy" width="768" height="1024">
+          <span><strong>{{ r.name }}</strong><small>{{ r.place }}</small></span>
+        </figcaption>
+      </figure>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="faq" class="container section anchor">
+  <div class="split split--start">
+    <div class="split__media split__media--second">
+      <img src="{{ url_for('static', filename='img/faq-shopping.jpg') }}" alt="Friends browsing colourful dresses in the store" loading="lazy" width="864" height="1088" class="img-45">
+    </div>
+    <div class="split__text split__text--first">
+      <h2 class="h2-xl">Frequently Asked <span class="muted-soft">Questions</span></h2>
+      <div class="accordion">
+        {% for f in faqs %}
+          <details name="faq" {{ 'open' if loop.first }}>
+            <summary>{{ f.q }}<svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <p>{{ f.a }}</p>
+          </details>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
 
 {# ---------- Store ---------- #}
 <section id="store" class="container anchor store">
