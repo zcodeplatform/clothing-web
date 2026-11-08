@@ -1,7 +1,4 @@
-"""Static catalog and site content (replaces src/data/products.ts).
-
-Move PRODUCTS to a database (SQLite/SQLAlchemy) before adding admin editing.
-"""
+"""Initial product catalog and static site content."""
 
 CATEGORIES = [
     {"id": "sweatwear", "label": "Sweatwear"},
@@ -169,9 +166,13 @@ SOCIALS = [
 
 
 def discount_percent(p):
-    if not p.get("compare_at"):
+    if isinstance(p, dict):
+        compare_at, price = p.get("compare_at"), p["price"]
+    else:
+        compare_at, price = p.compare_at, p.price
+    if not compare_at:
         return 0
-    return round((p["compare_at"] - p["price"]) / p["compare_at"] * 100)
+    return round((compare_at - price) / compare_at * 100)
 
 
 def format_price(n):

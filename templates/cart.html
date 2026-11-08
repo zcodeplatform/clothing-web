@@ -7,13 +7,13 @@
 {% macro qty_control(i) -%}
 <div class="qty">
   <form method="post" action="{{ url_for('cart_update') }}">
-    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}"><input type="hidden" name="color" value="{{ i.color }}">
     <input type="hidden" name="qty" value="{{ i.qty - 1 }}">
     <button type="submit" aria-label="Decrease quantity">{{ icon('minus', 'icon icon--sm') }}</button>
   </form>
   <span>{{ i.qty }}</span>
   <form method="post" action="{{ url_for('cart_update') }}">
-    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}"><input type="hidden" name="color" value="{{ i.color }}">
     <input type="hidden" name="qty" value="{{ i.qty + 1 }}">
     <button type="submit" aria-label="Increase quantity">{{ icon('plus', 'icon icon--sm') }}</button>
   </form>
@@ -22,7 +22,7 @@
 
 {% macro remove_btn(i) -%}
 <form method="post" action="{{ url_for('cart_remove') }}">
-  <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+  <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}"><input type="hidden" name="color" value="{{ i.color }}">
   <button type="submit" class="remove" aria-label="Remove {{ i.product.name }}">{{ icon('trash') }}</button>
 </form>
 {%- endmacro %}
@@ -49,10 +49,11 @@
         {% for i in cart['items'] %}
           <li class="cart-item">
             <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item_img">
-              <img src="{{ url_for('static', filename='img/' ~ i.product.image) }}" alt="{{ i.product.name }}" loading="lazy" width="768" height="1024">
+              <img src="{{ url_for('static', filename=i.product.image) }}" alt="{{ i.product.name }}" loading="lazy" width="768" height="1024">
             </a>
             <div class="cart-item_info">
               <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item_name">{{ i.product.name }}</a>
+              <p class="muted small">{{ i.color }}</p>
               <p class="muted small">Size {{ i.size }}</p>
               <p class="small strong">{{ i.product.price|price }}</p>
               <div class="cart-item_mobile">{{ qty_control(i) }}{{ remove_btn(i) }}</div>

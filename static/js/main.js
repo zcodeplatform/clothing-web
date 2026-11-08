@@ -37,9 +37,9 @@
     return { ok: res.ok && data.ok !== false, data };
   }
 
-  async function addToBag(slug, size, qty, label) {
+  async function addToBag(slug, color, size, qty, label) {
     try {
-      const { ok, data } = await postJSON("/api/cart/add", { slug, size, qty });
+      const { ok, data } = await postJSON("/api/cart/add", { slug, color, size, qty });
       if (!ok) return toast(data.error || "Could not add to bag", "error");
       setCartCount(data.count);
       toast(label);
@@ -52,7 +52,7 @@
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-add-to-bag]");
     if (!btn) return;
-    addToBag(btn.dataset.slug, btn.dataset.size, 1, `${btn.dataset.name} added to bag`);
+    addToBag(btn.dataset.slug, btn.dataset.color, btn.dataset.size, 1, `${btn.dataset.name} added to bag`);
   });
 
   /* ---------- mobile drawer ---------- */
@@ -98,38 +98,99 @@
   /* ---------- product page options ---------- */
   const pdp = $("#pdp");
   if (pdp) {
+    let color = $("[data-color].is-active", pdp)?.dataset.color || "";
     let size = $(".size.is-active", pdp)?.dataset.size || "";
     let qty = 1;
     const qtyEl = $("#qty-value");
+    const plusButton = $("#qty-plus");
+    const minusButton = $("#qty-minus");
+    const addButton = $("#add-to-bag");
 
-    $("#color-options").addEventListener("click", (e) => {
-      const b = e.target.closest("[data-color]");
-      if (!b) return;
-      $$("#color-options .pill").forEach((x) => {
-        const on = x === b;
-        x.classList.toggle("is-active", on);
-        x.setAttribute("aria-pressed", String(on));
+    function currentStock() {
+      return Number($(".size.is-active", pdp)?.dataset.stock || 0);
+    }
+
+    function updateQuantityControls() {
+      const stock = currentStock();
+      qty = stock > 0 ? Math.max(1, Math.min(qty, stock)) : 1;
+      qtyEl.textContent = qty;
+      plusButton.disabled = qty >= stock;
+      minusButton.disabled = qty <= 1;
+      addButton.disabled = !size || stock < 1;
+    }
+
+    function selectSize(button) {
+      size = button?.dataset.size || "";
+      $$("#size-options .size").forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("is-active", selected);
+        item.setAttribute("aria-pressed", String(selected));
       });
-      $("#color-label").textContent = b.dataset.color;
+      updateQuantityControls();
+    }
+
+    $("#color-options")?.addEventListener("click", (e) => {
+      const button = e.target.closest("[data-color]");
+      if (!button) return;
+      color = button.dataset.color;
+      $$("#color-options .pill").forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("is-active", selected);
+        item.setAttribute("aria-pressed", String(selected));
+      });
+      $("#color-label").textContent = color;
+
+      const stocks = JSON.parse(button.dataset.stocks);
+      let nextSize = null;
+      $$("#size-options .size").forEach((item) => {
+        item.dataset.stock = String(stocks[item.dataset.size] || 0);
+        item.disabled = Number(item.dataset.stock) < 1;
+        if (!nextSize && !item.disabled && item.dataset.size === size) nextSize = item;
+      });
+      if (!nextSize) nextSize = $("#size-options .size:not(:disabled)");
+      qty = 1;
+      selectSize(nextSize);
     });
 
-    $("#size-options").addEventListener("click", (e) => {
+    $("#size-options")?.addEventListener("click", (e) => {
       const b = e.target.closest("[data-size]");
-      if (!b) return;
-      size = b.dataset.size;
-      $$("#size-options .size").forEach((x) => {
-        const on = x === b;
-        x.classList.toggle("is-active", on);
-        x.setAttribute("aria-pressed", String(on));
-      });
+      if (!b || b.disabled) return;
+      selectSize(b);
     });
 
-    $("#qty-minus").addEventListener("click", () => { qty = Math.max(1, qty - 1); qtyEl.textContent = qty; });
-    $("#qty-plus").addEventListener("click", () => { qty = Math.min(99, qty + 1); qtyEl.textContent = qty; });
+    minusButton.addEventListener("click", () => { qty = Math.max(1, qty - 1); updateQuantityControls(); });
+    plusButton.addEventListener("click", () => { qty = Math.min(currentStock(), qty + 1); updateQuantityControls(); });
 
-    $("#add-to-bag").addEventListener("click", () => {
+    addButton.addEventListener("click", () => {
       if (!size) return toast("Please choose a size", "error");
-      addToBag(pdp.dataset.slug, size, qty, `${pdp.dataset.name} (${size}) added to bag`);
+      addToBag(pdp.dataset.slug, color, size, qty, `${pdp.dataset.name} (${color}, ${size}) added to bag`);
+    });
+    updateQuantityControls();
+  }
+
+  /* ---------- product image gallery ---------- */
+  const gallery = $("[data-gallery]");
+  if (gallery) {
+    const images = $$("[data-gallery-image]", gallery);
+    const thumbnails = $$("[data-gallery-index]", gallery);
+    const count = $("[data-gallery-count]", gallery);
+    let activeIndex = 0;
+
+    function showImage(index) {
+      activeIndex = (index + images.length) % images.length;
+      images.forEach((image, i) => { image.hidden = i !== activeIndex; });
+      thumbnails.forEach((button, i) => {
+        const active = i === activeIndex;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      if (count) count.textContent = `${activeIndex + 1} / ${images.length}`;
+    }
+
+    $("[data-gallery-prev]", gallery)?.addEventListener("click", () => showImage(activeIndex - 1));
+    $("[data-gallery-next]", gallery)?.addEventListener("click", () => showImage(activeIndex + 1));
+    thumbnails.forEach((button) => {
+      button.addEventListener("click", () => showImage(Number(button.dataset.galleryIndex)));
     });
   }
 

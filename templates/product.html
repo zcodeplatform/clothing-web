@@ -3,6 +3,8 @@
 {% set off = discount_percent(p) %}
 {% block title %}{{ p.name }} - Eclothing{% endblock %}
 {% block description %}{{ p.description }}{% endblock %}
+{% set default_variant = p.default_variant %}
+{% set default_color = default_variant.color if default_variant else (p.colors[0] if p.colors else '') %}
 
 {% block content %}
 <div class="container page page--tight">
@@ -13,9 +15,30 @@
   </nav>
 
   <div class="pdp" id="pdp" data-slug="{{ p.slug }}" data-name="{{ p.name }}">
-    <div class="pdp_media">
-      <img src="{{ url_for('static', filename='img/' ~ p.image) }}" alt="{{ p.name }}" width="768" height="1024">
+    <div class="pdp_gallery" data-gallery>
+      <div class="pdp_media" id="product-image-gallery" aria-live="polite">
+        {% for image in p.images %}
+          <img src="{{ url_for('static', filename=image.path) }}" alt="{{ image.alt_text or p.name }}"
+               width="768" height="1024" {{ 'hidden' if not loop.first }} data-gallery-image>
+        {% endfor %}
+      </div>
       {% if off > 0 %}<span class="badge badge--sale badge--xl">-{{ off }}%</span>{% endif %}
+      {% if p.images|length > 1 %}
+        <div class="pdp_gallery-controls">
+          <button type="button" class="icon-btn icon-btn--ghost" data-gallery-prev aria-label="Previous product image">{{ icon('arrow-right', 'icon rotate-180') }}</button>
+          <span data-gallery-count aria-live="polite">1 / {{ p.images|length }}</span>
+          <button type="button" class="icon-btn icon-btn--ghost" data-gallery-next aria-label="Next product image">{{ icon('arrow-right') }}</button>
+        </div>
+        <div class="pdp_thumbnails" aria-label="Product images">
+          {% for image in p.images %}
+            <button type="button" class="pdp_thumbnail {{ 'is-active' if loop.first }}"
+                    data-gallery-index="{{ loop.index0 }}" aria-label="Show image {{ loop.index }}"
+                    aria-pressed="{{ 'true' if loop.first else 'false' }}">
+              <img src="{{ url_for('static', filename=image.path) }}" alt="" loading="lazy">
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
 
     <div class="pdp_info">
@@ -27,21 +50,28 @@
       </p>
       <p class="pdp_desc">{{ p.description }}</p>
 
-      <div class="opt">
-        <p class="opt_label">Colour: <span class="muted" id="color-label">{{ p.colors[0] }}</span></p>
-        <div class="opt_row" id="color-options">
+      {% if p.colors %}
+        <div class="opt">
+          <p class="opt_label">Colour: <span class="muted" id="color-label">{{ default_color }}</span></p>
+          <div class="opt_row" id="color-options">
           {% for c in p.colors %}
-            <button type="button" class="pill {{ 'is-active' if loop.first }}" data-color="{{ c }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ c }}</button>
+            <button type="button" class="pill {{ 'is-active' if c == default_color }}"
+                    data-color="{{ c }}" data-stocks='{{ p.stocks_for(c)|tojson }}'
+                    aria-pressed="{{ 'true' if c == default_color else 'false' }}">{{ c }}</button>
           {% endfor %}
+          </div>
         </div>
-      </div>
+      {% endif %}
 
       <div class="opt">
         <p class="opt_label">Size</p>
         <div class="opt_row" id="size-options">
           {% for s in p.sizes %}
-            {% set pre = p.sizes|length == 1 %}
-            <button type="button" class="size {{ 'is-active' if pre }}" data-size="{{ s }}" aria-pressed="{{ 'true' if pre else 'false' }}">{{ s }}</button>
+            {% set stock = p.stock_for(default_color, s) %}
+            {% set pre = default_variant and default_variant.size == s %}
+            <button type="button" class="size {{ 'is-active' if pre }}" data-size="{{ s }}"
+                    data-stock="{{ stock }}" aria-pressed="{{ 'true' if pre else 'false' }}"
+                    {{ 'disabled' if stock < 1 }}>{{ s }}</button>
           {% endfor %}
         </div>
       </div>
@@ -52,7 +82,8 @@
           <span id="qty-value">1</span>
           <button type="button" id="qty-plus" aria-label="Increase quantity">{{ icon('plus') }}</button>
         </div>
-        <button type="button" class="btn btn--camel btn--xl buy_add" id="add-to-bag">{{ icon('bag') }} Add to Bag</button>
+        <button type="button" class="btn btn--camel btn--xl buy_add" id="add-to-bag"
+                {{ 'disabled' if not default_variant }}>{{ icon('bag') }} Add to Bag</button>
       </div>
 
       <ul class="details">

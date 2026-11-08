@@ -1142,6 +1142,10 @@ body.no-scroll {
   margin-top: 1.5rem;
 }
 
+.pdp_gallery {
+  position: relative;
+}
+
 .pdp_media {
   position: relative;
   overflow: hidden;
@@ -1150,6 +1154,39 @@ body.no-scroll {
   align-self: start;
 }
 .pdp_media img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+
+.pdp_gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.rotate-180 {
+  transform: rotate(180deg);
+}
+.pdp_thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+.pdp_thumbnail {
+  flex: 0 0 4.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.pdp_thumbnail.is-active {
+  border-color: var(--foreground);
+}
+.pdp_thumbnail img {
   width: 100%;
   aspect-ratio: 3/4;
   object-fit: cover;
@@ -1227,6 +1264,11 @@ body.no-scroll {
   background: var(--ink);
   color: var(--ink-foreground);
   border-color: var(--ink);
+}
+.size:disabled,
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 .opt.has-error .opt_label {
   color: var(--destructive);

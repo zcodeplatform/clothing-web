@@ -5,16 +5,26 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from flask import (Flask, abort, flash, jsonify, redirect, render_template,
-                   request, session, url_for)
+from flask import (Flask, abort, current_app, flash, jsonify, redirect,
+                   render_template, request, session, url_for)
+from flask_migrate import Migrate
+from sqlalchemy import or_
+from sqlalchemy.orm import selectinload
 
 import data
+from models import Product, ProductImage, ProductVariant, db
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "sqlite:///nara.sqlite"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 30  # 30 days
+db.init_app(app)
+Migrate(app, db)
 
 INSTANCE = Path(app.instance_path)
 INSTANCE.mkdir(parents=True, exist_ok=True)
@@ -33,11 +43,30 @@ def save_lines(lines):
 
 def cart_summary():
     items = []
-    for line in get_lines():
-        product = data.PRODUCT_INDEX.get(line["slug"])
-        if product:
-            items.append({**line, "product": product})
-    subtotal = sum(i["product"]["price"] * i["qty"] for i in items)
+    lines = get_lines()
+    slugs = {line["slug"] for line in lines}
+    products = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    ).filter(Product.slug.in_(slugs)).all() if slugs else []
+    product_by_slug = {product.slug: product for product in products}
+
+    for line in lines:
+        product = product_by_slug.get(line["slug"])
+        if not product:
+            continue
+        color = line.get("color")
+        variant = product.variant_for(color, line["size"]) if color else None
+        if variant is None:
+            variant = next(
+                (item for item in product.variants if item.size == line["size"]),
+                None,
+            )
+        if variant is None:
+            continue
+        item = {**line, "color": variant.color, "product": product, "variant": variant}
+        items.append(item)
+
+    subtotal = sum((item["product"].price * item["qty"] for item in items), start=0)
     shipping = data.shipping_for(subtotal)
     return {
         "items": items,
@@ -49,20 +78,40 @@ def cart_summary():
     }
 
 
-def valid_line(slug, size):
-    p = data.PRODUCT_INDEX.get(slug)
-    return p is not None and size in p["sizes"]
+def valid_line(slug, size, color=None):
+    query = ProductVariant.query.join(Product).filter(
+        Product.slug == slug, ProductVariant.size == size
+    )
+    if color:
+        query = query.filter(ProductVariant.color == color)
+    else:
+        query = query.order_by(ProductVariant.id)
+    return query.first()
 
 
-def add_to_cart(slug, size, qty):
+def add_to_cart(slug, size, color, qty):
+    variant = ProductVariant.query.join(Product).filter(
+        Product.slug == slug,
+        ProductVariant.size == size,
+        ProductVariant.color == color,
+    ).first()
+    if variant is None or variant.stock < 1:
+        return False
+
     lines = get_lines()
     for l in lines:
-        if l["slug"] == slug and l["size"] == size:
-            l["qty"] = min(99, l["qty"] + qty)
+        if l["slug"] == slug and l["size"] == size and l.get("color") == color:
+            l["qty"] = min(variant.stock, l["qty"] + qty)
             break
     else:
-        lines.append({"slug": slug, "size": size, "qty": min(99, qty)})
+        lines.append({
+            "slug": slug,
+            "size": size,
+            "color": color,
+            "qty": min(variant.stock, qty),
+        })
     save_lines(lines)
+    return True
 
 
 def store_record(filename, record):
@@ -79,7 +128,7 @@ def inject_globals():
         "STORE": data.STORE,
         "SOCIALS": data.SOCIALS,
         "FREE_SHIPPING_THRESHOLD": data.FREE_SHIPPING_THRESHOLD,
-        "cart_count": sum(l["qty"] for l in get_lines() if l["slug"] in data.PRODUCT_INDEX),
+        "cart_count": cart_summary()["count"],
         "year": datetime.now().year,
     }
 
@@ -88,13 +137,53 @@ app.jinja_env.filters["price"] = data.format_price
 app.jinja_env.globals["discount_percent"] = data.discount_percent
 
 
+@app.cli.command("seed-catalog")
+def seed_catalog():
+    """Insert the bundled demo catalog into an initialized database."""
+    for item in data.PRODUCTS:
+        if Product.query.filter_by(slug=item["slug"]).first():
+            continue
+
+        product = Product(
+            slug=item["slug"],
+            name=item["name"],
+            category=item["category"],
+            price=item["price"],
+            compare_at=item.get("compare_at"),
+            description=item["description"],
+            details=item["details"],
+            is_new=item.get("is_new", False),
+        )
+        product.images.append(ProductImage(
+            path=f"img/{item['image']}",
+            alt_text=item["name"],
+            position=0,
+        ))
+        for color in item["colors"]:
+            for size in item["sizes"]:
+                product.variants.append(ProductVariant(
+                    color=color,
+                    size=size,
+                    stock=99,
+                ))
+        db.session.add(product)
+
+    db.session.commit()
+    current_app.logger.info("Bundled product catalog seeded.")
+
+
 # ---------------------------------------------------------------------- pages
 @app.route("/")
 def index():
     active = request.args.get("style", "all")
     if active not in data.CATEGORY_IDS:
         active = "all"
-    pool = data.PRODUCTS if active == "all" else [p for p in data.PRODUCTS if p["category"] == active]
+    query = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    )
+    if active != "all":
+        query = query.filter_by(category=active)
+    pool = query.order_by(Product.id).all()
     return render_template(
         "index.html",
         style_products=pool[:4],
@@ -116,20 +205,29 @@ def shop():
     sort = request.args.get("sort", "featured")
     sort = sort if sort in ("featured", "low", "high") else "featured"
 
-    items = list(data.PRODUCTS)
+    query = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    )
     if category:
-        items = [p for p in items if p["category"] == category]
+        query = query.filter_by(category=category)
     if flt == "new":
-        items = [p for p in items if p.get("is_new")]
+        query = query.filter_by(is_new=True)
     if flt == "sale":
-        items = [p for p in items if p.get("compare_at")]
+        query = query.filter(Product.compare_at.isnot(None))
     if q:
-        t = q.lower()
-        items = [p for p in items if t in f'{p["name"]} {p["description"]} {p["category"]}'.lower()]
+        term = f"%{q}%"
+        query = query.filter(or_(
+            Product.name.ilike(term),
+            Product.description.ilike(term),
+            Product.category.ilike(term),
+        ))
     if sort == "low":
-        items.sort(key=lambda p: p["price"])
+        query = query.order_by(Product.price.asc(), Product.id)
     elif sort == "high":
-        items.sort(key=lambda p: -p["price"])
+        query = query.order_by(Product.price.desc(), Product.id)
+    else:
+        query = query.order_by(Product.id)
+    items = query.all()
 
     if q:
         title = f"Results for “{q}”"
@@ -148,13 +246,19 @@ def shop():
 
 @app.route("/product/<slug>")
 def product(slug):
-    p = data.PRODUCT_INDEX.get(slug)
+    p = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    ).filter_by(slug=slug).first()
     if not p:
         abort(404)
-    same = [x for x in data.PRODUCTS if x["slug"] != slug and x["category"] == p["category"]]
-    other = [x for x in data.PRODUCTS if x["category"] != p["category"]]
+    same = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    ).filter(Product.slug != slug, Product.category == p.category).order_by(Product.id).all()
+    other = Product.query.options(
+        selectinload(Product.images), selectinload(Product.variants)
+    ).filter(Product.category != p.category).order_by(Product.id).all()
     return render_template("product.html", p=p, related=(same + other)[:4],
-                           category_label=data.CATEGORY_LABELS[p["category"]])
+                           category_label=data.CATEGORY_LABELS[p.category])
 
 
 @app.route("/about")
@@ -203,28 +307,35 @@ def cart():
 @app.post("/api/cart/add")
 def api_cart_add():
     payload = request.get_json(silent=True) or {}
-    slug, size = payload.get("slug"), payload.get("size")
+    slug, size, color = payload.get("slug"), payload.get("size"), payload.get("color")
     try:
         qty = max(1, min(99, int(payload.get("qty", 1))))
     except (TypeError, ValueError):
         qty = 1
-    if not valid_line(slug, size):
+    variant = valid_line(slug, size, color)
+    if variant is None or variant.stock < 1:
         return jsonify(ok=False, error="Invalid product or size"), 400
-    add_to_cart(slug, size, qty)
+    if qty > variant.stock:
+        return jsonify(ok=False, error=f"Only {variant.stock} available"), 400
+    if not add_to_cart(slug, size, variant.color, qty):
+        return jsonify(ok=False, error="This option is out of stock"), 400
     return jsonify(ok=True, count=cart_summary()["count"])
 
 
 @app.post("/cart/update")
 def cart_update():
     slug, size = request.form.get("slug"), request.form.get("size")
+    color = request.form.get("color")
     try:
         qty = int(request.form.get("qty", 1))
     except ValueError:
         qty = 1
     lines = []
     for l in get_lines():
-        if l["slug"] == slug and l["size"] == size:
-            l["qty"] = min(99, qty)
+        if (l["slug"] == slug and l["size"] == size
+                and (not color or l.get("color") in (None, color))):
+            variant = valid_line(slug, size, color or l.get("color"))
+            l["qty"] = min(variant.stock, qty) if variant else 0
         if l["qty"] > 0:
             lines.append(l)
     save_lines(lines)
@@ -233,8 +344,19 @@ def cart_update():
 
 @app.post("/cart/remove")
 def cart_remove():
-    slug, size = request.form.get("slug"), request.form.get("size")
-    save_lines([l for l in get_lines() if not (l["slug"] == slug and l["size"] == size)])
+    slug, size, color = (
+        request.form.get("slug"),
+        request.form.get("size"),
+        request.form.get("color"),
+    )
+    save_lines([
+        line for line in get_lines()
+        if not (
+            line["slug"] == slug
+            and line["size"] == size
+            and (not color or line.get("color") in (None, color))
+        )
+    ])
     return redirect(url_for("cart"))
 
 
@@ -243,10 +365,31 @@ def checkout():
     summary = cart_summary()
     if not summary["items"]:
         return redirect(url_for("cart"))
+    for item in summary["items"]:
+        variant = item["variant"]
+        if variant.stock < item["qty"]:
+            flash(
+                f"Only {variant.stock} of {item['product'].name} "
+                f"({variant.color}, {variant.size}) remain in stock.",
+                "error",
+            )
+            return redirect(url_for("cart"))
+
     store_record("orders.jsonl", {
-        "items": [{"slug": i["slug"], "size": i["size"], "qty": i["qty"]} for i in summary["items"]],
-        "total": summary["total"],
+        "items": [
+            {
+                "slug": item["slug"],
+                "color": item["color"],
+                "size": item["size"],
+                "qty": item["qty"],
+            }
+            for item in summary["items"]
+        ],
+        "total": float(summary["total"]),
     })
+    for item in summary["items"]:
+        item["variant"].stock -= item["qty"]
+    db.session.commit()
     save_lines([])
     session["order_placed"] = True
     flash("Order placed!", "success")

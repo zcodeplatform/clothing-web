@@ -50,10 +50,10 @@
 
 {% macro product_card(p) -%}
 {% set off = discount_percent(p) %}
-{% set default_size = p.sizes[2] if p.sizes|length > 2 else p.sizes[-1] %}
+{% set default_variant = p.default_variant %}
 <article class="product-card">
   <a href="{{ url_for('product', slug=p.slug) }}" class="product-card_media">
-    <img src="{{ url_for('static', filename='img/' ~ p.image) }}" alt="{{ p.name }}" loading="lazy" width="768" height="1024">
+    <img src="{{ url_for('static', filename=p.image) }}" alt="{{ p.name }}" loading="lazy" width="768" height="1024">
     {% if off > 0 %}<span class="badge badge--sale">-{{ off }}%</span>{% endif %}
     {% if p.is_new %}<span class="badge badge--new">New</span>{% endif %}
   </a>
@@ -66,8 +66,10 @@
       </p>
     </div>
     <button type="button" class="icon-btn icon-btn--ink" data-add-to-bag
-            data-slug="{{ p.slug }}" data-size="{{ default_size }}" data-name="{{ p.name }}"
-            aria-label="Add {{ p.name }} to bag">{{ icon('bag') }}</button>
+            data-slug="{{ p.slug }}" data-color="{{ default_variant.color if default_variant else '' }}"
+            data-size="{{ default_variant.size if default_variant else '' }}"
+            data-stock="{{ default_variant.stock if default_variant else 0 }}" data-name="{{ p.name }}"
+            aria-label="Add {{ p.name }} to bag" {{ 'disabled' if not default_variant or not default_variant.stock }}>{{ icon('bag') }}</button>
   </div>
 </article>
 {%- endmacro %}

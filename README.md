@@ -9,6 +9,8 @@ Converted from the original React + TanStack + Tailwind project; design, pages, 
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+flask --app app db upgrade
+flask --app app seed-catalog
 python app.py                      # http://127.0.0.1:5000
 ```
 
@@ -18,16 +20,17 @@ Production: `SECRET_KEY=<long-random-string> gunicorn app:app`
 
 ```
 app.py               Flask routes, session cart, form/newsletter endpoints
-data.py              Catalog, categories, FAQs, reviews, store info (was src/data/products.ts)
+models.py            SQLAlchemy product, product image, and color/size inventory models
+data.py              Categories, FAQs, reviews, store info, and initial catalog data
+migrations/          Flask-Migrate/Alembic database migrations
 templates/           Jinja2 templates
   base.html            <head>, header, footer, toasts
   _macros.html         inline SVG icons (incl. social SVGs) + product card
   index / shop / product / cart / about / contact / 404 / 500 .html
-  partials/            header, footer, faq, reviews
 static/css/style.css  All styling (design tokens + responsive breakpoints 640/768/1024)
 static/js/main.js     Mobile menu, search, toasts, add-to-bag, product options, forms
 static/img/           Product, lifestyle and logo images
-instance/             Created at runtime: messages.jsonl, subscribers.jsonl, orders.jsonl
+instance/             SQLite database and runtime JSONL records
 ```
 
 ## Routes
@@ -43,6 +46,18 @@ instance/             Created at runtime: messages.jsonl, subscribers.jsonl, ord
 | `POST /cart/update`, `/cart/remove`, `/checkout` | Cart forms |
 | `POST /newsletter`, `POST /contact` | Saved to `instance/*.jsonl` |
 
+## Product catalog
+
+The catalog is stored in SQLite by default (`instance/nara.sqlite`). Set
+`DATABASE_URL` to use another SQLAlchemy database URL. `ProductImage` rows are
+ordered for the product gallery; `ProductVariant` rows track stock for each
+color/size combination. `price` is the current selling price, and optional
+`compare_at` is the higher original price used to show a discount.
+
+The initial catalog seed gives the demo products 99 units per color/size
+combination. Future schema changes should use Flask-Migrate
+(`flask --app app db migrate`, then `flask --app app db upgrade`).
+
 ## What changed vs. the React version
 
 - **Cart** now lives in the Flask session (signed cookie) instead of `localStorage`.
@@ -57,6 +72,6 @@ instance/             Created at runtime: messages.jsonl, subscribers.jsonl, ord
 
 ## Next steps
 
-- Move `PRODUCTS` from `data.py` into SQLite/SQLAlchemy before adding an admin area.
+- Add protected admin screens for creating and editing products and uploading images.
 - Add a payment provider (Stripe Checkout) in the `/checkout` route.
 - Set a real `SECRET_KEY` in production.
