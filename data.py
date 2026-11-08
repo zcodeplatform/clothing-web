@@ -118,9 +118,9 @@ PRODUCT_INDEX = {p["slug"]: p for p in PRODUCTS}
 
 STORE = {
     "name": "Eclothing, NYC",
-    "address": "123 Fashion Street, New York, NY",
-    "email": "hello@Eclothing.store",
-    "phone": "+1 212 555 0147",
+    "address": "123 Fashion Street, Nairobi, Kenya",
+    "email": "hello@eclothing.store",
+    "phone": "+254 000 000 000",
     "hours": "Mon – Sat, 10am – 8pm",
     "map_url": "https://maps.google.com/?q=New+York+NY",
 }

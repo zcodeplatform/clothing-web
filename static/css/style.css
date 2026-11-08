@@ -619,8 +619,7 @@ body.no-scroll {
   position: relative;
   overflow: hidden;
   border-radius: 2rem;
-  background: var(--gradient-hero);
-  color: var(--primary-foreground);
+  color: var(--foreground);
   padding: 2rem 1.25rem 1.5rem;
 }
 
@@ -633,7 +632,7 @@ body.no-scroll {
   font-weight: 800;
   line-height: 0.85;
   letter-spacing: -0.05em;
-  color: color-mix(in oklch, var(--primary-foreground) 20%, transparent);
+  color: color-mix(in oklch, var(--foreground) 12%, transparent);
 }
 
 .hero_model {
@@ -672,7 +671,7 @@ body.no-scroll {
   display: flex;
   flex-direction: column;
   align-self: end;
-  border-block: 1px solid rgb(255 255 255 / 0.4);
+  border-block: 1px solid var(--border);
 }
 
 .offer {
@@ -685,7 +684,7 @@ body.no-scroll {
 }
 
 .offer + .offer {
-  border-top: 1px solid rgb(255 255 255 / 0.4);
+  border-top: 1px solid var(--border);
 }
 .offer strong {
   display: block;
