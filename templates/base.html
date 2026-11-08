@@ -22,7 +22,7 @@
   {% set ep = request.endpoint %}
   {% set nav = [
     ('Shop', url_for('shop'), ep == 'shop' and not (request.args.get('filter') or request.args.get('category') or request.args.get('q'))),
-    ('New Arrival', url_for('shop', filter='new'), ep == 'shop' and request.args.get('filter') == 'new'),
+    ('New arrival', url_for('shop', filter='new'), ep == 'shop' and request.args.get('filter') == 'new'),
     ('Sale', url_for('shop', filter='sale'), ep == 'shop' and request.args.get('filter') == 'sale'),
     ('About', url_for('about'), ep == 'about'),
     ('Contact', url_for('contact'), ep == 'contact'),
@@ -31,7 +31,7 @@
     <div class="container header_bar">
       <a href="{{ url_for('index') }}" class="logo" aria-label="Eclothing home">
         <img src="{{ url_for('static', filename='img/Eclothing-logo.png') }}" alt="" width="435" height="629">
-        <span>Eclothing</span>
+        <span>eclothing</span>
       </a>
 
       <nav class="header_nav" aria-label="Main">
@@ -99,7 +99,7 @@
           <h3 class="footer_heading">Shop</h3>
           <ul class="footer_list">
             <li><a href="{{ url_for('shop') }}">All Collection</a></li>
-            <li><a href="{{ url_for('shop', filter='new') }}">New Arrival</a></li>
+            <li><a href="{{ url_for('shop', filter='new') }}">New arrival</a></li>
             <li><a href="{{ url_for('shop', filter='sale') }}">Sale</a></li>
             <li><a href="{{ url_for('shop', category='formal') }}">Formal Wear</a></li>
             <li><a href="{{ url_for('shop', category='accessories') }}">Accessories</a></li>
