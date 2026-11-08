@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon, product_card %}
+{% set off = discount_percent(p) %}
+{% block title %}{{ p.name }} - Eclothing{% endblock %}
+{% block description %}{{ p.description }}{% endblock %}
+
+{% block content %}
+<div class="container page page--tight">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{{ url_for('shop') }}">Women</a><span>›</span>
+    <a href="{{ url_for('shop', category=p.category) }}">{{ category_label }}</a><span>›</span>
+    <strong>{{ p.name }}</strong>
+  </nav>
+
+  <div class="pdp" id="pdp" data-slug="{{ p.slug }}" data-name="{{ p.name }}">
+    <div class="pdp__media">
+      <img src="{{ url_for('static', filename='img/' ~ p.image) }}" alt="{{ p.name }}" width="768" height="1024">
+      {% if off > 0 %}<span class="badge badge--sale badge--xl">-{{ off }}%</span>{% endif %}
+    </div>
+
+    <div class="pdp__info">
+      {% if p.is_new %}<span class="tag">New Arrival</span>{% endif %}
+      <h1 class="h1-lg">{{ p.name }}</h1>
+      <p class="pdp__price">
+        <span class="pdp__now">{{ p.price|price }}</span>
+        {% if p.compare_at %}<span class="pdp__was">{{ p.compare_at|price }}</span>{% endif %}
+      </p>
+      <p class="pdp__desc">{{ p.description }}</p>
+
+      <div class="opt">
+        <p class="opt__label">Colour: <span class="muted" id="color-label">{{ p.colors[0] }}</span></p>
+        <div class="opt__row" id="color-options">
+          {% for c in p.colors %}
+            <button type="button" class="pill {{ 'is-active' if loop.first }}" data-color="{{ c }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ c }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="opt">
+        <p class="opt__label">Size</p>
+        <div class="opt__row" id="size-options">
+          {% for s in p.sizes %}
+            {% set pre = p.sizes|length == 1 %}
+            <button type="button" class="size {{ 'is-active' if pre }}" data-size="{{ s }}" aria-pressed="{{ 'true' if pre else 'false' }}">{{ s }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="buy">
+        <div class="qty qty--lg">
+          <button type="button" id="qty-minus" aria-label="Decrease quantity">{{ icon('minus') }}</button>
+          <span id="qty-value">1</span>
+          <button type="button" id="qty-plus" aria-label="Increase quantity">{{ icon('plus') }}</button>
+        </div>
+        <button type="button" class="btn btn--camel btn--xl buy__add" id="add-to-bag">{{ icon('bag') }} Add to Bag</button>
+      </div>
+
+      <ul class="details">
+        {% for d in p.details %}<li>{{ icon('check', 'icon accent-deep') }} {{ d }}</li>{% endfor %}
+      </ul>
+
+      <div class="perks">
+        <div>{{ icon('truck', 'icon icon--lg accent-deep') }} Free shipping over {{ FREE_SHIPPING_THRESHOLD|price }}</div>
+        <div>{{ icon('rotate', 'icon icon--lg accent-deep') }} 30-day easy returns</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="related">
+    <h2 class="h2-lg">You may also like</h2>
+    <div class="grid-products grid-products--4">
+      {% for r in related %}{{ product_card(r) }}{% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon %}
+{% block title %}Contact Eclothing - Customer Care & Store{% endblock %}
+{% block description %}Get in touch with Eclothing customer care or visit our store in New York.{% endblock %}
+
+{% block content %}
+<section class="container page page--hero">
+  <div class="split split--start">
+    <div>
+      <p class="eyebrow">Contact</p>
+      <h1 class="h1-xl h1-xl--sm">We'd love to hear from you.</h1>
+      <p class="muted small narrow-l mt-4">Questions about sizing, an order or a return? Our customer care team replies within a day.</p>
+      <ul class="info-grid">
+        <li><a href="tel:{{ STORE.phone.replace(' ', '') }}" class="info">
+          <span class="info__icon">{{ icon('phone') }}</span><span><small>Phone</small><strong>{{ STORE.phone }}</strong></span></a></li>
+        <li><a href="mailto:{{ STORE.email }}" class="info">
+          <span class="info__icon">{{ icon('mail') }}</span><span><small>Email</small><strong>{{ STORE.email }}</strong></span></a></li>
+        <li><a href="{{ STORE.map_url }}" target="_blank" rel="noreferrer" class="info">
+          <span class="info__icon">{{ icon('pin') }}</span><span><small>Store</small><strong>{{ STORE.address }}</strong></span></a></li>
+        <li><div class="info">
+          <span class="info__icon">{{ icon('clock') }}</span><span><small>Hours</small><strong>{{ STORE.hours }}</strong></span></div></li>
+      </ul>
+    </div>
+
+    <form class="contact-form" id="contact-form" method="post" action="{{ url_for('contact') }}" novalidate>
+      <h2 class="h3-lg">Send a message</h2>
+      <label><span>Name</span><input name="name" maxlength="100" required autocomplete="name"></label>
+      <label><span>Email</span><input type="email" name="email" maxlength="255" required autocomplete="email"></label>
+      <label><span>Message</span><textarea name="message" rows="5" maxlength="1000" required></textarea></label>
+      <button type="submit" class="btn btn--camel btn--xl btn--block">Send Message</button>
+    </form>
+  </div>
+</section>
+{% include 'partials/faq.html' %}
+{% endblock %}

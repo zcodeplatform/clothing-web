@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon %}
+{% block title %}Your Bag - Eclothing{% endblock %}
+{% block description %}Review the pieces in your Eclothing shopping bag and check out.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+
+{% macro qty_control(i) -%}
+<div class="qty">
+  <form method="post" action="{{ url_for('cart_update') }}">
+    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+    <input type="hidden" name="qty" value="{{ i.qty - 1 }}">
+    <button type="submit" aria-label="Decrease quantity">{{ icon('minus', 'icon icon--sm') }}</button>
+  </form>
+  <span>{{ i.qty }}</span>
+  <form method="post" action="{{ url_for('cart_update') }}">
+    <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+    <input type="hidden" name="qty" value="{{ i.qty + 1 }}">
+    <button type="submit" aria-label="Increase quantity">{{ icon('plus', 'icon icon--sm') }}</button>
+  </form>
+</div>
+{%- endmacro %}
+
+{% macro remove_btn(i) -%}
+<form method="post" action="{{ url_for('cart_remove') }}">
+  <input type="hidden" name="slug" value="{{ i.slug }}"><input type="hidden" name="size" value="{{ i.size }}">
+  <button type="submit" class="remove" aria-label="Remove {{ i.product.name }}">{{ icon('trash') }}</button>
+</form>
+{%- endmacro %}
+
+{% block content %}
+{% if placed %}
+  <div class="container page center-page">
+    <p class="eyebrow">Thank you</p>
+    <h1 class="h1-lg">Your order is placed</h1>
+    <p class="muted small narrow">We've received your order and will email you a confirmation shortly.</p>
+    <a class="btn btn--ink btn--xl" href="{{ url_for('shop') }}">Continue shopping</a>
+  </div>
+{% elif not cart['items'] %}
+  <div class="container page center-page">
+    <h1 class="h1-lg">Your bag is empty</h1>
+    <p class="muted small">Find something you love in the collection.</p>
+    <a class="btn btn--camel btn--xl" href="{{ url_for('shop') }}">Start shopping</a>
+  </div>
+{% else %}
+  <div class="container page">
+    <h1 class="h1-lg">Your Bag</h1>
+    <div class="cart">
+      <ul class="cart__list">
+        {% for i in cart['items'] %}
+          <li class="cart-item">
+            <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item__img">
+              <img src="{{ url_for('static', filename='img/' ~ i.product.image) }}" alt="{{ i.product.name }}" loading="lazy" width="768" height="1024">
+            </a>
+            <div class="cart-item__info">
+              <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item__name">{{ i.product.name }}</a>
+              <p class="muted small">Size {{ i.size }}</p>
+              <p class="small strong">{{ i.product.price|price }}</p>
+              <div class="cart-item__mobile">{{ qty_control(i) }}{{ remove_btn(i) }}</div>
+            </div>
+            <div class="cart-item__desktop">
+              {{ qty_control(i) }}
+              <span class="cart-item__total">{{ (i.product.price * i.qty)|price }}</span>
+              {{ remove_btn(i) }}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <aside class="summary">
+        <h2 class="h3-lg">Order Summary</h2>
+        <dl>
+          <div><dt>Subtotal</dt><dd>{{ cart.subtotal|price }}</dd></div>
+          <div><dt>Shipping</dt><dd>{{ 'Free' if cart.shipping == 0 else cart.shipping|price }}</dd></div>
+          <div class="summary__total"><dt>Total</dt><dd>{{ cart.total|price }}</dd></div>
+        </dl>
+        {% if cart.remaining > 0 %}<p class="summary__note">Add {{ cart.remaining|price }} more for free shipping.</p>{% endif %}
+        <form method="post" action="{{ url_for('checkout') }}">
+          <button type="submit" class="btn btn--ink btn--xl btn--block">Checkout</button>
+        </form>
+        <a href="{{ url_for('shop') }}" class="summary__link">Continue shopping</a>
+      </aside>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

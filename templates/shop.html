@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon, product_card %}
+{% block title %}Shop Women's Clothing - Eclothing{% endblock %}
+{% block description %}Browse every Eclothing piece: formal wear, casual comfort, sweatwear, activewear, bottoms and accessories.{% endblock %}
+
+{% block content %}
+<div class="container page">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{{ url_for('index') }}">Women</a><span>›</span><strong>{{ title }}</strong>
+  </nav>
+
+  <div class="shop-head">
+    <div>
+      <h1 class="h1-lg">{{ title }}</h1>
+      <p class="muted small mt-2">{{ products|length }} pieces</p>
+    </div>
+    <form method="get" action="{{ url_for('shop') }}" class="sort" id="sort-form">
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      {% if flt %}<input type="hidden" name="filter" value="{{ flt }}">{% endif %}
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      {{ icon('sliders', 'icon muted') }}
+      <label class="sr-only" for="sort-select">Sort by</label>
+      <select name="sort" id="sort-select" data-autosubmit>
+        <option value="featured" {{ 'selected' if sort == 'featured' }}>Featured</option>
+        <option value="low" {{ 'selected' if sort == 'low' }}>Price: Low to High</option>
+        <option value="high" {{ 'selected' if sort == 'high' }}>Price: High to Low</option>
+      </select>
+      <noscript><button type="submit" class="btn btn--pill-sm">Apply</button></noscript>
+    </form>
+  </div>
+
+  <div class="pills">
+    <a href="{{ url_for('shop') }}" class="pill {{ 'is-active' if not category and not flt }}">All</a>
+    <a href="{{ url_for('shop', filter='new') }}" class="pill {{ 'is-active' if flt == 'new' }}">New</a>
+    <a href="{{ url_for('shop', filter='sale') }}" class="pill {{ 'is-active' if flt == 'sale' }}">Sale</a>
+    {% for c in CATEGORIES %}
+      <a href="{{ url_for('shop', category=c.id) }}" class="pill {{ 'is-active' if category == c.id }}">{{ c.label }}</a>
+    {% endfor %}
+  </div>
+
+  {% if products %}
+    <div class="grid-products grid-products--shop">
+      {% for p in products %}{{ product_card(p) }}{% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <p class="empty__title">Nothing here yet</p>
+      <p class="muted small">Try another category or search term.</p>
+      <a class="btn btn--ink btn--xl" href="{{ url_for('shop') }}">See all pieces</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

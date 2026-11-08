@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Something went wrong - Eclothing{% endblock %}
+{% block content %}
+<div class="notfound">
+  <div>
+    <h2>This page didn't load</h2>
+    <p>Something went wrong on our end. You can try refreshing or head back home.</p>
+    <a class="btn btn--camel" href="{{ url_for('index') }}">Go home</a>
+  </div>
+</div>
+{% endblock %}

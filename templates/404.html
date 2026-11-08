@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Page not found - Eclothing{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="notfound">
+  <div>
+    <h1>404</h1>
+    <h2>Page not found</h2>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
+    <a class="btn btn--camel" href="{{ url_for('index') }}">Go home</a>
+  </div>
+</div>
+{% endblock %}

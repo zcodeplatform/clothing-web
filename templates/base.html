@@ -1,0 +1,36 @@
+{% from '_macros.html' import icon, social_icon %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Eclothing - Women's Clothing{% endblock %}</title>
+  <meta name="description" content="{% block description %}Eclothing womenswear: tailored pieces, soft essentials and accessories.{% endblock %}">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  {% block robots %}{% endblock %}
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Urbanist:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="site">
+  {% include 'partials/header.html' %}
+  <main class="site__main">
+    {% block content %}{% endblock %}
+  </main>
+  {% include 'partials/footer.html' %}
+</div>
+
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+{% for category, message in get_flashed_messages(with_categories=true) %}
+  <span hidden data-flash data-type="{{ category }}">{{ message }}</span>
+{% endfor %}
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

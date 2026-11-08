@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon %}
+{% block title %}About Eclothing - Womenswear Designed With Care{% endblock %}
+{% block description %}Meet Eclothing: a womenswear label crafting tailored pieces and soft essentials from sketch to seam.{% endblock %}
+
+{% block content %}
+<section class="container page page--hero">
+  <p class="eyebrow">Our Story</p>
+  <h1 class="h1-xl">Clothes made for women who move through the world with intention.</h1>
+  <div class="about-imgs">
+    <img src="{{ url_for('static', filename='img/about-atelier.jpg') }}" alt="Designer in the Eclothing atelier" width="1024" height="768">
+    <img src="{{ url_for('static', filename='img/store-2.jpg') }}" alt="The Eclothing store" loading="lazy" width="768" height="1024">
+  </div>
+</section>
+
+<section class="band band--cream">
+  <div class="container split">
+    <div class="prose">
+      <p>Eclothing began as a small studio with one sewing machine and a simple idea: everyday clothes should feel as considered as occasion wear. Ten years later, that idea still guides every collection we design.</p>
+      <p>We design in small runs, work closely with the workshops that make our pieces, and listen carefully to the women who wear them. The result is a wardrobe of tailoring, soft essentials and accessories that work together, season after season.</p>
+    </div>
+    <div class="stat-cards">
+      {% for s in stats %}<div><p class="stats__v">{{ s.value }}</p><p class="muted tiny">{{ s.label }}</p></div>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="container section">
+  <h2 class="h2-xl">What we stand for</h2>
+  <div class="values">
+    {% for v in values %}
+      <div class="value">
+        <span class="value__icon">{{ icon(v.icon, 'icon icon--lg') }}</span>
+        <h3>{{ v.title }}</h3>
+        <p>{{ v.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-12"><a class="btn btn--camel btn--xl" href="{{ url_for('shop') }}">Shop the collection</a></div>
+</section>
+
+{% include 'partials/reviews.html' %}
+{% endblock %}

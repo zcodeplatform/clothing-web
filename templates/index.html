@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import icon, product_card %}
+{% block title %}Eclothing - Women's Clothing Collection{% endblock %}
+{% block description %}Shop Eclothing's women's collection: tailored blazers, satin shirts, cosy lounge sets, activewear and accessories.{% endblock %}
+
+{% block content %}
+{# ---------- Hero ---------- #}
+<section class="container hero-wrap">
+  <div class="hero">
+    <h1 class="hero__word">FASHION</h1>
+    <img class="hero__model" src="{{ url_for('static', filename='img/hero-model.webp') }}" alt="Model in a black wide-brim hat, cream knit and black trousers" width="1024" height="1280" fetchpriority="high">
+    <div class="hero__content">
+      <div class="hero__cta">
+        <p>Winter Gear That Actually Works.</p>
+        <a href="{{ url_for('shop') }}" class="btn btn--ink btn--sm-pad">Discover More {{ icon('arrow-up-right') }}</a>
+      </div>
+      <div class="hero__offers">
+        <a href="{{ url_for('shop', filter='sale') }}" class="offer">
+          <span><strong>Christmas Sale</strong><small>Up To 60%</small></span>
+          <span class="offer__arrow">{{ icon('arrow-up-right') }}</span>
+        </a>
+        <a href="{{ url_for('shop') }}" class="offer">
+          <span><strong>Get 20% Discount</strong><small>For Couple Orders</small></span>
+          <span class="offer__arrow">{{ icon('arrow-up-right') }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------- Find your style ---------- #}
+<section class="container section anchor" id="find-your-style">
+  <div class="section-head">
+    <h2 class="h2-xl">Find Your Style</h2>
+    <p>Shop by category and discover looks that suit your mood. Fit any occasion and elevate your daily routine.</p>
+  </div>
+
+  <div class="pills">
+    <a href="{{ url_for('index') }}#find-your-style" class="pill {{ 'is-active' if active_style == 'all' }}">All</a>
+    {% for c in CATEGORIES %}
+      <a href="{{ url_for('index', style=c.id) }}#find-your-style" class="pill {{ 'is-active' if active_style == c.id }}">{{ c.label }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="grid-products grid-products--4">
+    {% for p in style_products %}{{ product_card(p) }}{% endfor %}
+  </div>
+
+  <div class="center-row">
+    <a class="btn btn--ink btn--xl" href="{{ url_for('shop', category=active_style) if active_style != 'all' else url_for('shop') }}">View all pieces {{ icon('arrow-right') }}</a>
+  </div>
+</section>
+
+{# ---------- About ---------- #}
+<section class="band band--cream">
+  <div class="container split">
+    <div class="split__media rounded-xl shadow-soft">
+      <img src="{{ url_for('static', filename='img/about-atelier.jpg') }}" alt="Designer smiling in the Eclothing atelier" loading="lazy" width="1024" height="768" class="img-43">
+    </div>
+    <div class="split__text">
+      <p class="eyebrow">About Us</p>
+      <h2 class="h2-lg">Redefining Fashion, One Stitch at a Time.</h2>
+      <p class="lead">Every piece is designed in our studio and finished with care - from the first sketch to the final seam. Trendy design, premium fabrics and a fit that moves with you, so you can dress with confidence every single day.</p>
+      <div class="stats">
+        {% for s in stats %}<div><p class="stats__v">{{ s.value }}</p><p class="stats__l">{{ s.label }}</p></div>{% endfor %}
+      </div>
+      <div class="about-actions">
+        <a class="btn btn--camel btn--xl" href="{{ url_for('shop') }}">Explore Collection {{ icon('arrow-right') }}</a>
+        <a href="tel:{{ STORE.phone.replace(' ', '') }}" class="phone-link">
+          <span class="phone-link__icon">{{ icon('phone') }}</span>
+          <span><small>Customer Care</small><strong>{{ STORE.phone }}</strong></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------- Trending ---------- #}
+<section class="trending">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      {% for i in range(12) %}<span class="{{ 'is-accent' if i % 2 }}">Trending Right Now</span>{% endfor %}
+    </div>
+  </div>
+  <div class="container tiles">
+    {% for t in tiles %}
+      <a href="{{ url_for('shop', **t.args) }}" class="tile tile--{{ t.span }}">
+        <img src="{{ url_for('static', filename='img/' ~ t.image) }}" alt="{{ t.title }}" loading="lazy">
+        <div class="tile__fade"></div>
+        {% if t.badge %}<span class="badge badge--sale badge--lg">{{ t.badge }}</span>{% endif %}
+        <div class="tile__text">
+          <h3>{{ t.title }}</h3>
+          <span class="tile__btn">Shop Now</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% include 'partials/reviews.html' %}
+{% include 'partials/faq.html' %}
+
+{# ---------- Store ---------- #}
+<section id="store" class="container anchor store">
+  <h2 class="h2-xl">Our Store Location</h2>
+  <div class="store__grid">
+    <div class="store__info">
+      {{ icon('pin', 'icon icon--xl accent-deep') }}
+      <h3>{{ STORE.name }}</h3>
+      <div class="store__lines"><p>{{ STORE.address }}</p><p>{{ STORE.email }}</p><p>{{ STORE.phone }}</p><p>{{ STORE.hours }}</p></div>
+      <a class="btn btn--soft" href="{{ STORE.map_url }}" target="_blank" rel="noreferrer">Visit Store</a>
+    </div>
+    <img src="{{ url_for('static', filename='img/store-1.jpg') }}" alt="Inside the store: soft pink dresses and knits" loading="lazy" width="768" height="1024">
+    <img src="{{ url_for('static', filename='img/store-2.jpg') }}" alt="Inside the store: tailoring and mannequins" loading="lazy" width="768" height="1024">
+  </div>
+</section>
+{% endblock %}
