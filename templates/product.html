@@ -13,23 +13,23 @@
   </nav>
 
   <div class="pdp" id="pdp" data-slug="{{ p.slug }}" data-name="{{ p.name }}">
-    <div class="pdp__media">
+    <div class="pdp_media">
       <img src="{{ url_for('static', filename='img/' ~ p.image) }}" alt="{{ p.name }}" width="768" height="1024">
       {% if off > 0 %}<span class="badge badge--sale badge--xl">-{{ off }}%</span>{% endif %}
     </div>
 
-    <div class="pdp__info">
+    <div class="pdp_info">
       {% if p.is_new %}<span class="tag">New Arrival</span>{% endif %}
       <h1 class="h1-lg">{{ p.name }}</h1>
-      <p class="pdp__price">
-        <span class="pdp__now">{{ p.price|price }}</span>
-        {% if p.compare_at %}<span class="pdp__was">{{ p.compare_at|price }}</span>{% endif %}
+      <p class="pdp_price">
+        <span class="pdp_now">{{ p.price|price }}</span>
+        {% if p.compare_at %}<span class="pdp_was">{{ p.compare_at|price }}</span>{% endif %}
       </p>
-      <p class="pdp__desc">{{ p.description }}</p>
+      <p class="pdp_desc">{{ p.description }}</p>
 
       <div class="opt">
-        <p class="opt__label">Colour: <span class="muted" id="color-label">{{ p.colors[0] }}</span></p>
-        <div class="opt__row" id="color-options">
+        <p class="opt_label">Colour: <span class="muted" id="color-label">{{ p.colors[0] }}</span></p>
+        <div class="opt_row" id="color-options">
           {% for c in p.colors %}
             <button type="button" class="pill {{ 'is-active' if loop.first }}" data-color="{{ c }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ c }}</button>
           {% endfor %}
@@ -37,8 +37,8 @@
       </div>
 
       <div class="opt">
-        <p class="opt__label">Size</p>
-        <div class="opt__row" id="size-options">
+        <p class="opt_label">Size</p>
+        <div class="opt_row" id="size-options">
           {% for s in p.sizes %}
             {% set pre = p.sizes|length == 1 %}
             <button type="button" class="size {{ 'is-active' if pre }}" data-size="{{ s }}" aria-pressed="{{ 'true' if pre else 'false' }}">{{ s }}</button>
@@ -52,7 +52,7 @@
           <span id="qty-value">1</span>
           <button type="button" id="qty-plus" aria-label="Increase quantity">{{ icon('plus') }}</button>
         </div>
-        <button type="button" class="btn btn--camel btn--xl buy__add" id="add-to-bag">{{ icon('bag') }} Add to Bag</button>
+        <button type="button" class="btn btn--camel btn--xl buy_add" id="add-to-bag">{{ icon('bag') }} Add to Bag</button>
       </div>
 
       <ul class="details">

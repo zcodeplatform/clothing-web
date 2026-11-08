@@ -52,15 +52,15 @@
 {% set off = discount_percent(p) %}
 {% set default_size = p.sizes[2] if p.sizes|length > 2 else p.sizes[-1] %}
 <article class="product-card">
-  <a href="{{ url_for('product', slug=p.slug) }}" class="product-card__media">
+  <a href="{{ url_for('product', slug=p.slug) }}" class="product-card_media">
     <img src="{{ url_for('static', filename='img/' ~ p.image) }}" alt="{{ p.name }}" loading="lazy" width="768" height="1024">
     {% if off > 0 %}<span class="badge badge--sale">-{{ off }}%</span>{% endif %}
     {% if p.is_new %}<span class="badge badge--new">New</span>{% endif %}
   </a>
-  <div class="product-card__row">
-    <div class="product-card__info">
-      <a href="{{ url_for('product', slug=p.slug) }}" class="product-card__name">{{ p.name }}</a>
-      <p class="product-card__price">
+  <div class="product-card_row">
+    <div class="product-card_info">
+      <a href="{{ url_for('product', slug=p.slug) }}" class="product-card_name">{{ p.name }}</a>
+      <p class="product-card_price">
         <strong>{{ p.price|price }}</strong>
         {% if p.compare_at %}<span class="was">{{ p.compare_at|price }}</span>{% endif %}
       </p>

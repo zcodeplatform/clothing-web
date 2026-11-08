@@ -12,13 +12,13 @@
       <p class="muted small narrow-l mt-4">Questions about sizing, an order or a return? Our customer care team replies within a day.</p>
       <ul class="info-grid">
         <li><a href="tel:{{ STORE.phone.replace(' ', '') }}" class="info">
-          <span class="info__icon">{{ icon('phone') }}</span><span><small>Phone</small><strong>{{ STORE.phone }}</strong></span></a></li>
+          <span class="info_icon">{{ icon('phone') }}</span><span><small>Phone</small><strong>{{ STORE.phone }}</strong></span></a></li>
         <li><a href="mailto:{{ STORE.email }}" class="info">
-          <span class="info__icon">{{ icon('mail') }}</span><span><small>Email</small><strong>{{ STORE.email }}</strong></span></a></li>
+          <span class="info_icon">{{ icon('mail') }}</span><span><small>Email</small><strong>{{ STORE.email }}</strong></span></a></li>
         <li><a href="{{ STORE.map_url }}" target="_blank" rel="noreferrer" class="info">
-          <span class="info__icon">{{ icon('pin') }}</span><span><small>Store</small><strong>{{ STORE.address }}</strong></span></a></li>
+          <span class="info_icon">{{ icon('pin') }}</span><span><small>Store</small><strong>{{ STORE.address }}</strong></span></a></li>
         <li><div class="info">
-          <span class="info__icon">{{ icon('clock') }}</span><span><small>Hours</small><strong>{{ STORE.hours }}</strong></span></div></li>
+          <span class="info_icon">{{ icon('clock') }}</span><span><small>Hours</small><strong>{{ STORE.hours }}</strong></span></div></li>
       </ul>
     </div>
 
@@ -33,10 +33,10 @@
 </section>
 <section id="faq" class="container section anchor">
   <div class="split split--start">
-    <div class="split__media split__media--second">
+    <div class="split_media split_media--second">
       <img src="{{ url_for('static', filename='img/faq-shopping.jpg') }}" alt="Friends browsing colourful dresses in the store" loading="lazy" width="864" height="1088" class="img-45">
     </div>
-    <div class="split__text split__text--first">
+    <div class="split_text split_text--first">
       <h2 class="h2-xl">Frequently Asked <span class="muted-soft">Questions</span></h2>
       <div class="accordion">
         {% for f in faqs %}

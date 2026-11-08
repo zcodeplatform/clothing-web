@@ -28,36 +28,36 @@
     ('Contact', url_for('contact'), ep == 'contact'),
   ] %}
   <header class="header">
-    <div class="container header__bar">
+    <div class="container header_bar">
       <a href="{{ url_for('index') }}" class="logo" aria-label="Eclothing home">
         <img src="{{ url_for('static', filename='img/Eclothing-logo.png') }}" alt="" width="435" height="629">
         <span>Eclothing</span>
       </a>
 
-      <nav class="header__nav" aria-label="Main">
+      <nav class="header_nav" aria-label="Main">
         {% for label, href, active in nav %}
           <a href="{{ href }}" class="{{ 'is-active' if active }}">{{ label }}</a>
         {% endfor %}
       </nav>
 
-      <div class="header__actions">
+      <div class="header_actions">
         <button type="button" class="icon-btn icon-btn--ink" id="search-toggle" aria-label="Search" aria-expanded="false" aria-controls="search-panel">
           <span data-open>{{ icon('search') }}</span><span data-close hidden>{{ icon('x') }}</span>
         </button>
-        <a href="{{ url_for('contact') }}" class="icon-btn icon-btn--ghost header__user" aria-label="Account and help">{{ icon('user') }}</a>
+        <a href="{{ url_for('contact') }}" class="icon-btn icon-btn--ghost header_user" aria-label="Account and help">{{ icon('user') }}</a>
         <a href="{{ url_for('cart') }}" class="icon-btn icon-btn--ghost cart-link" aria-label="Cart">
           {{ icon('bag') }}
           <span class="cart-badge" data-cart-count {{ 'hidden' if cart_count == 0 }}>{{ cart_count }}</span>
         </a>
-        <button type="button" class="icon-btn icon-btn--ghost header__burger" id="menu-open" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <button type="button" class="icon-btn icon-btn--ghost header_burger" id="menu-open" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
           {{ icon('menu', 'icon icon--lg') }}
         </button>
       </div>
     </div>
 
     <div class="search-panel" id="search-panel" hidden>
-      <form action="{{ url_for('shop') }}" method="get" class="container search-panel__form" role="search">
-        {{ icon('search', 'icon search-panel__icon') }}
+      <form action="{{ url_for('shop') }}" method="get" class="container search-panel_form" role="search">
+        {{ icon('search', 'icon search-panel_icon') }}
         <input type="search" name="q" id="search-input" value="{{ request.args.get('q', '') }}" placeholder="Search dresses, blazers, bags…" aria-label="Search products" maxlength="100">
         <button type="submit">Search</button>
       </form>
@@ -66,28 +66,28 @@
 
   <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
   <aside class="drawer" id="mobile-menu" aria-label="Menu" aria-hidden="true">
-    <div class="drawer__top">
+    <div class="drawer_top">
       <a href="{{ url_for('index') }}" class="logo">
         <img src="{{ url_for('static', filename='img/Eclothing-logo.png') }}" alt="" width="435" height="629"><span>Eclothing</span>
       </a>
       <button type="button" class="icon-btn icon-btn--ghost" id="menu-close" aria-label="Close menu">{{ icon('x') }}</button>
     </div>
-    <nav class="drawer__nav" aria-label="Mobile">
+    <nav class="drawer_nav" aria-label="Mobile">
       <a href="{{ url_for('index') }}">Home</a>
       {% for label, href, active in nav %}<a href="{{ href }}">{{ label }}</a>{% endfor %}
       <a href="{{ url_for('cart') }}">Cart (<span data-cart-count-text>{{ cart_count }}</span>)</a>
     </nav>
   </aside>
 
-  <main class="site__main">
+  <main class="site_main">
     {% block content %}{% endblock %}
   </main>
   <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__grid">
-        <div class="footer__brand">
-          <p class="footer__tagline">Elevate your everyday style.</p>
-          <p class="footer__blurb">Thoughtfully designed womenswear - tailored pieces, soft essentials and statement accessories made to be worn on repeat.</p>
+    <div class="container footer_inner">
+      <div class="footer_grid">
+        <div class="footer_brand">
+          <p class="footer_tagline">Elevate your everyday style.</p>
+          <p class="footer_blurb">Thoughtfully designed womenswear - tailored pieces, soft essentials and statement accessories made to be worn on repeat.</p>
           <div class="socials">
             {% for s in SOCIALS %}
               <a href="{{ s.href }}" target="_blank" rel="noreferrer" aria-label="{{ s.label }}">{{ social_icon(s.icon) }}</a>
@@ -96,8 +96,8 @@
         </div>
 
         <div>
-          <h3 class="footer__heading">Shop</h3>
-          <ul class="footer__list">
+          <h3 class="footer_heading">Shop</h3>
+          <ul class="footer_list">
             <li><a href="{{ url_for('shop') }}">All Collection</a></li>
             <li><a href="{{ url_for('shop', filter='new') }}">New Arrival</a></li>
             <li><a href="{{ url_for('shop', filter='sale') }}">Sale</a></li>
@@ -107,8 +107,8 @@
         </div>
 
         <div>
-          <h3 class="footer__heading">Company</h3>
-          <ul class="footer__list">
+          <h3 class="footer_heading">Company</h3>
+          <ul class="footer_list">
             <li><a href="{{ url_for('about') }}">About Us</a></li>
             <li><a href="{{ url_for('contact') }}">Contact</a></li>
             <li><a href="{{ url_for('index') }}#faq">FAQ</a></li>
@@ -116,9 +116,9 @@
           </ul>
         </div>
 
-        <div class="footer__news">
-          <h3 class="footer__heading">Newsletter</h3>
-          <p class="footer__muted">New drops and private sales, first.</p>
+        <div class="footer_news">
+          <h3 class="footer_heading">Newsletter</h3>
+          <p class="footer_muted">New drops and private sales, first.</p>
           <form class="newsletter" id="newsletter-form" action="{{ url_for('newsletter') }}" method="post" novalidate>
             <input type="email" name="email" placeholder="Your email" aria-label="Email address" autocomplete="email">
             <button type="submit" aria-label="Subscribe">{{ icon('arrow-up-right') }}</button>
@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <div class="footer__legal">
+      <div class="footer_legal">
         <span>{{ STORE.phone }}</span>
         <span>{{ STORE.email }}</span>
         <span>{{ STORE.address }}</span>

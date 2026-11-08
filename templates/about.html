@@ -20,7 +20,7 @@
       <p>We design in small runs, work closely with the workshops that make our pieces, and listen carefully to the women who wear them. The result is a wardrobe of tailoring, soft essentials and accessories that work together, season after season.</p>
     </div>
     <div class="stat-cards">
-      {% for s in stats %}<div><p class="stats__v">{{ s.value }}</p><p class="muted tiny">{{ s.label }}</p></div>{% endfor %}
+      {% for s in stats %}<div><p class="stats_v">{{ s.value }}</p><p class="muted tiny">{{ s.label }}</p></div>{% endfor %}
     </div>
   </div>
 </section>
@@ -30,7 +30,7 @@
   <div class="values">
     {% for v in values %}
       <div class="value">
-        <span class="value__icon">{{ icon(v.icon, 'icon icon--lg') }}</span>
+        <span class="value_icon">{{ icon(v.icon, 'icon icon--lg') }}</span>
         <h3>{{ v.title }}</h3>
         <p>{{ v.text }}</p>
       </div>

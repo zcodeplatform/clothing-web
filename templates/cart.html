@@ -45,21 +45,21 @@
   <div class="container page">
     <h1 class="h1-lg">Your Bag</h1>
     <div class="cart">
-      <ul class="cart__list">
+      <ul class="cart_list">
         {% for i in cart['items'] %}
           <li class="cart-item">
-            <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item__img">
+            <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item_img">
               <img src="{{ url_for('static', filename='img/' ~ i.product.image) }}" alt="{{ i.product.name }}" loading="lazy" width="768" height="1024">
             </a>
-            <div class="cart-item__info">
-              <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item__name">{{ i.product.name }}</a>
+            <div class="cart-item_info">
+              <a href="{{ url_for('product', slug=i.slug) }}" class="cart-item_name">{{ i.product.name }}</a>
               <p class="muted small">Size {{ i.size }}</p>
               <p class="small strong">{{ i.product.price|price }}</p>
-              <div class="cart-item__mobile">{{ qty_control(i) }}{{ remove_btn(i) }}</div>
+              <div class="cart-item_mobile">{{ qty_control(i) }}{{ remove_btn(i) }}</div>
             </div>
-            <div class="cart-item__desktop">
+            <div class="cart-item_desktop">
               {{ qty_control(i) }}
-              <span class="cart-item__total">{{ (i.product.price * i.qty)|price }}</span>
+              <span class="cart-item_total">{{ (i.product.price * i.qty)|price }}</span>
               {{ remove_btn(i) }}
             </div>
           </li>
@@ -71,13 +71,13 @@
         <dl>
           <div><dt>Subtotal</dt><dd>{{ cart.subtotal|price }}</dd></div>
           <div><dt>Shipping</dt><dd>{{ 'Free' if cart.shipping == 0 else cart.shipping|price }}</dd></div>
-          <div class="summary__total"><dt>Total</dt><dd>{{ cart.total|price }}</dd></div>
+          <div class="summary_total"><dt>Total</dt><dd>{{ cart.total|price }}</dd></div>
         </dl>
-        {% if cart.remaining > 0 %}<p class="summary__note">Add {{ cart.remaining|price }} more for free shipping.</p>{% endif %}
+        {% if cart.remaining > 0 %}<p class="summary_note">Add {{ cart.remaining|price }} more for free shipping.</p>{% endif %}
         <form method="post" action="{{ url_for('checkout') }}">
           <button type="submit" class="btn btn--ink btn--xl btn--block">Checkout</button>
         </form>
-        <a href="{{ url_for('shop') }}" class="summary__link">Continue shopping</a>
+        <a href="{{ url_for('shop') }}" class="summary_link">Continue shopping</a>
       </aside>
     </div>
   </div>

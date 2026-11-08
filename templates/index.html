@@ -7,21 +7,21 @@
 {# ---------- Hero ---------- #}
 <section class="container hero-wrap">
   <div class="hero">
-    <h1 class="hero__word">FASHION</h1>
-    <img class="hero__model" src="{{ url_for('static', filename='img/hero-model.webp') }}" alt="Model in a black wide-brim hat, cream knit and black trousers" width="1024" height="1280" fetchpriority="high">
-    <div class="hero__content">
-      <div class="hero__cta">
+    <h1 class="hero_word">FASHION</h1>
+    <img class="hero_model" src="{{ url_for('static', filename='img/hero-model.webp') }}" alt="Model in a black wide-brim hat, cream knit and black trousers" width="1024" height="1280" fetchpriority="high">
+    <div class="hero_content">
+      <div class="hero_cta">
         <p>Winter Gear That Actually Works.</p>
         <a href="{{ url_for('shop') }}" class="btn btn--ink btn--sm-pad">Discover More {{ icon('arrow-up-right') }}</a>
       </div>
-      <div class="hero__offers">
+      <div class="hero_offers">
         <a href="{{ url_for('shop', filter='sale') }}" class="offer">
           <span><strong>Christmas Sale</strong><small>Up To 60%</small></span>
-          <span class="offer__arrow">{{ icon('arrow-up-right') }}</span>
+          <span class="offer_arrow">{{ icon('arrow-up-right') }}</span>
         </a>
         <a href="{{ url_for('shop') }}" class="offer">
           <span><strong>Get 20% Discount</strong><small>For Couple Orders</small></span>
-          <span class="offer__arrow">{{ icon('arrow-up-right') }}</span>
+          <span class="offer_arrow">{{ icon('arrow-up-right') }}</span>
         </a>
       </div>
     </div>
@@ -54,20 +54,20 @@
 {# ---------- About ---------- #}
 <section class="band band--cream">
   <div class="container split">
-    <div class="split__media rounded-xl shadow-soft">
+    <div class="split_media rounded-xl shadow-soft">
       <img src="{{ url_for('static', filename='img/about-atelier.jpg') }}" alt="Designer smiling in the Eclothing atelier" loading="lazy" width="1024" height="768" class="img-43">
     </div>
-    <div class="split__text">
+    <div class="split_text">
       <p class="eyebrow">About Us</p>
       <h2 class="h2-lg">Redefining Fashion, One Stitch at a Time.</h2>
       <p class="lead">Every piece is designed in our studio and finished with care - from the first sketch to the final seam. Trendy design, premium fabrics and a fit that moves with you, so you can dress with confidence every single day.</p>
       <div class="stats">
-        {% for s in stats %}<div><p class="stats__v">{{ s.value }}</p><p class="stats__l">{{ s.label }}</p></div>{% endfor %}
+        {% for s in stats %}<div><p class="stats_v">{{ s.value }}</p><p class="stats_l">{{ s.label }}</p></div>{% endfor %}
       </div>
       <div class="about-actions">
         <a class="btn btn--camel btn--xl" href="{{ url_for('shop') }}">Explore Collection {{ icon('arrow-right') }}</a>
         <a href="tel:{{ STORE.phone.replace(' ', '') }}" class="phone-link">
-          <span class="phone-link__icon">{{ icon('phone') }}</span>
+          <span class="phone-link_icon">{{ icon('phone') }}</span>
           <span><small>Customer Care</small><strong>{{ STORE.phone }}</strong></span>
         </a>
       </div>
@@ -78,7 +78,7 @@
 {# ---------- Trending ---------- #}
 <section class="trending">
   <div class="marquee" aria-hidden="true">
-    <div class="marquee__track">
+    <div class="marquee_track">
       {% for i in range(12) %}<span class="{{ 'is-accent' if i % 2 }}">Trending Right Now</span>{% endfor %}
     </div>
   </div>
@@ -86,11 +86,11 @@
     {% for t in tiles %}
       <a href="{{ url_for('shop', **t.args) }}" class="tile tile--{{ t.span }}">
         <img src="{{ url_for('static', filename='img/' ~ t.image) }}" alt="{{ t.title }}" loading="lazy">
-        <div class="tile__fade"></div>
+        <div class="tile_fade"></div>
         {% if t.badge %}<span class="badge badge--sale badge--lg">{{ t.badge }}</span>{% endif %}
-        <div class="tile__text">
+        <div class="tile_text">
           <h3>{{ t.title }}</h3>
-          <span class="tile__btn">Shop Now</span>
+          <span class="tile_btn">Shop Now</span>
         </div>
       </a>
     {% endfor %}
@@ -115,10 +115,10 @@
 
 <section id="faq" class="container section anchor">
   <div class="split split--start">
-    <div class="split__media split__media--second">
+    <div class="split_media split_media--second">
       <img src="{{ url_for('static', filename='img/faq-shopping.jpg') }}" alt="Friends browsing colourful dresses in the store" loading="lazy" width="864" height="1088" class="img-45">
     </div>
-    <div class="split__text split__text--first">
+    <div class="split_text split_text--first">
       <h2 class="h2-xl">Frequently Asked <span class="muted-soft">Questions</span></h2>
       <div class="accordion">
         {% for f in faqs %}
@@ -135,11 +135,11 @@
 {# ---------- Store ---------- #}
 <section id="store" class="container anchor store">
   <h2 class="h2-xl">Our Store Location</h2>
-  <div class="store__grid">
-    <div class="store__info">
+  <div class="store_grid">
+    <div class="store_info">
       {{ icon('pin', 'icon icon--xl accent-deep') }}
       <h3>{{ STORE.name }}</h3>
-      <div class="store__lines"><p>{{ STORE.address }}</p><p>{{ STORE.email }}</p><p>{{ STORE.phone }}</p><p>{{ STORE.hours }}</p></div>
+      <div class="store_lines"><p>{{ STORE.address }}</p><p>{{ STORE.email }}</p><p>{{ STORE.phone }}</p><p>{{ STORE.hours }}</p></div>
       <a class="btn btn--soft" href="{{ STORE.map_url }}" target="_blank" rel="noreferrer">Visit Store</a>
     </div>
     <img src="{{ url_for('static', filename='img/store-1.jpg') }}" alt="Inside the store: soft pink dresses and knits" loading="lazy" width="768" height="1024">
