@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login - Eclothing{% endblock %}
+{% block description %}Sign in to manage the Eclothing product catalog.{% endblock %}
+{% block content %}
+<section class="container page admin-page">
+  <div class="admin-panel admin-login">
+    <img class="admin-login__logo" src="{{ url_for('static', filename='img/Eclothing-logo.png') }}" alt="Eclothing">
+    <h1 class="h1-lg">Welcome back</h1>
+    <p class="muted small">Sign in to manage your products.</p>
+    <form method="post" action="{{ url_for('admin') }}" class="admin-login__form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>
+        <span>Email address</span>
+        <input type="email" name="email" value="{{ admin_email|default('') }}" required autocomplete="username" maxlength="255">
+      </label>
+      <label>
+        <span>Password</span>
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn btn--ink btn--xl btn--block">Log in</button>
+    </form>
+    <p class="admin-login__note">Admin access only. Need an account? Ask the store owner.</p>
+  </div>
+</section>
+{% endblock %}

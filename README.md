@@ -11,10 +11,11 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 flask --app app db upgrade
 flask --app app seed-catalog
+flask --app app create-admin
 python app.py                      # http://127.0.0.1:5000
 ```
 
-Production: `SECRET_KEY=<long-random-string> gunicorn app:app`
+Production: `SECRET_KEY=<long-random-string> SESSION_COOKIE_SECURE=1 gunicorn app:app`
 
 ## Structure
 
@@ -42,6 +43,9 @@ instance/             SQLite database and runtime JSONL records
 | `/product/<slug>` | Product page |
 | `/cart` | Bag, order summary, checkout |
 | `/about`, `/contact` | Static pages / contact form |
+| `/admin` | Admin login and product dashboard |
+| `/admin/publish` | Create and publish a product |
+| `/admin/products/<id>/edit` | Edit product, images, and inventory |
 | `POST /api/cart/add` | JSON add-to-bag (used by the cards and product page) |
 | `POST /cart/update`, `/cart/remove`, `/checkout` | Cart forms |
 | `POST /newsletter`, `POST /contact` | Saved to `instance/*.jsonl` |
@@ -57,6 +61,9 @@ color/size combination. `price` is the current selling price, and optional
 The initial catalog seed gives the demo products 99 units per color/size
 combination. Future schema changes should use Flask-Migrate
 (`flask --app app db migrate`, then `flask --app app db upgrade`).
+Admin accounts are created only from the CLI with `flask --app app create-admin`;
+there is no public admin signup. Sign in at `/admin` to manage drafts, inventory,
+product images, discounts, and publishing.
 
 ## What changed vs. the React version
 

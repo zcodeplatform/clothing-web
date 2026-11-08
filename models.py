@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 
@@ -24,6 +25,7 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=False, default="")
     details = db.Column(db.JSON, nullable=False, default=list)
     is_new = db.Column(db.Boolean, nullable=False, default=False)
+    is_published = db.Column(db.Boolean, nullable=False, default=True, server_default=db.true())
 
     images = relationship(
         "ProductImage",
@@ -102,3 +104,11 @@ class ProductVariant(db.Model):
     stock = db.Column(db.Integer, nullable=False, default=0)
 
     product = relationship("Product", back_populates="variants")
+
+
+class AdminUser(UserMixin, db.Model):
+    __tablename__ = "admin_users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)

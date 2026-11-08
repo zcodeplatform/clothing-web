@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Eclothing{% endblock %}
+{% block description %}Manage the Eclothing product catalog.{% endblock %}
+{% block content %}
+<section class="container page admin-page">
+  <div class="admin-heading">
+    <div>
+      <h1 class="h1-lg">Products</h1>
+      <p class="muted small mt-2">Signed in as {{ current_user.email }}</p>
+    </div>
+    <div class="admin-actions">
+      <a class="btn btn--camel btn--xl" href="{{ url_for('admin_publish') }}">Add product</a>
+      <form method="post" action="{{ url_for('admin_logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn--pill-sm admin-logout">Log out</button>
+      </form>
+    </div>
+  </div>
+
+  {% if products %}
+    <div class="admin-products">
+      {% for product in products %}
+        <article class="admin-product">
+          {% if product.image %}
+            <img class="admin-product__image" src="{{ url_for('static', filename=product.image) }}" alt="">
+          {% else %}
+            <div class="admin-product__image admin-product__placeholder">No image</div>
+          {% endif %}
+          <div class="admin-product__info">
+            <h2>{{ product.name }}</h2>
+            <p class="muted small">{{ product.category }} · {{ product.price|price }}</p>
+            <p class="small">{{ product.images|length }} images · {{ product.variants|length }} inventory options</p>
+          </div>
+          <span class="admin-status {{ 'is-published' if product.is_published else 'is-draft' }}">
+            {{ 'Published' if product.is_published else 'Draft' }}
+          </span>
+          <div class="admin-product__actions">
+            <a class="btn btn--pill-sm" href="{{ url_for('admin_edit_product', product_id=product.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('admin_toggle_product', product_id=product.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn--pill-sm">
+                {{ 'Unpublish' if product.is_published else 'Publish' }}
+              </button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <p class="empty_title">No products yet</p>
+      <p class="muted small">Create your first product to start building the catalog.</p>
+      <a class="btn btn--camel btn--xl" href="{{ url_for('admin_publish') }}">Add product</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
